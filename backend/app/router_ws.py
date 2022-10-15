@@ -257,7 +257,7 @@ async def websocket_endpoint(websocket: WebSocket):
             ## Metrics
             particle_sizes_arr = []  # Среднее + макс каждую секунду
             large_particle_percentage = []  # Процент площади крупных частиц каждую секунду
-
+            negabarit_this_second = False  # Был ли в эту секунду негабарит
             if ret == True:
                 results = model(frame, size=1280)
                 results._run = _run_override.__get__(results, Detections)
@@ -265,6 +265,8 @@ async def websocket_endpoint(websocket: WebSocket):
                                                                                                   render=True)
                 particle_sizes_arr += predicted_sizes
                 large_particle_percentage.append((sum(predicted_areas) * 0.75) / (GREEN_AREA_AREA * 0.85))
+                if negabarit_found:
+                    negabarit_this_second = True
 
                 await manager.broadcast(str(image_to_base64(ims[0])))  # отправка байтов на фронт
 
@@ -290,6 +292,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     # Обнуляем все
                     particle_sizes_arr = []
                     large_particle_percentage = []
+                    negabarit_this_second = False
 
                 # ВСЕ ДОСТУПНЫЕ ДАННЫЕ!!
                 # ims[0] - картинка, каждый фрейм
@@ -298,7 +301,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 # max_predicted_size - максимальный размер частиц, каждую секунду
                 # average_large_particle_percentage - средний процент больших частиц по отношению к малым, каждую секунду
                 # histogram - dict с процентами классов, каждую секунду
-
+                # negabarit_this_second булевый флаг, был ли негабарит в секунду
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         await manager.broadcast(f"Client # left the chat")
