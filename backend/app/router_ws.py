@@ -300,7 +300,7 @@ async def websocket_endpoint(websocket: WebSocket):
                                'average_large_particle_percentage':float(average_large_particle_percentage),
                                'histogram':json.dumps(histogram),
                                }
-                    await manager.broadcast(json.dumps(metrics))  # отправка байтов на фронт
+                    await manager.broadcast(metrics)  # отправка байтов на фронт
 
                     # отправить все
 
