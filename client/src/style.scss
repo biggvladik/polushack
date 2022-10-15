@@ -1,9 +1,39 @@
 .page {
   height: 100vh;
   padding: 10px;
+  display: flex;
 }
 
 .stream {
-  width: 720px;
-  height: 393px;
+  width: 100%;
+  height: 27vw;
+}
+
+.left-items {
+  width: calc(52vw - 20px);
+}
+
+.right-items {
+  width: 48vw;
+}
+
+.chart1 {
+  width: 100%;
+  height: 500px;
+  margin: 0 10px 10px 0;
+}
+
+.chartsContainer {
+  height: 33%;
+}
+
+.chart2,
+.chart3 {
+  width: 50%;
+  height: 100%;
+}
+
+.chart4 {
+  height: 33%;
+  width: 100%;
 }
