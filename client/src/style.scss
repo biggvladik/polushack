@@ -36,11 +36,9 @@
   color: red;
   margin-right: 15px;
   opacity: 0;
-  display: none;
 
   &--active {
     opacity: 1;
-    display: block;
   }
 }
 

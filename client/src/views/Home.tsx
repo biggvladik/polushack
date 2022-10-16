@@ -1,11 +1,15 @@
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Chart, ChartItem, registerables } from "chart.js";
 import { WarningOutlined } from "@ant-design/icons";
+import { InputNumber, Button } from "antd";
 
 Chart.register(...registerables);
 let isChartsInited = false;
 
 export const Home: FC = () => {
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [sizeValue, setSizeValue] = useState(350);
+
   const streamImageRef = useRef<HTMLImageElement | null>(null);
 
   const chart1Ref = useRef<HTMLCanvasElement | null>(null);
@@ -15,6 +19,14 @@ export const Home: FC = () => {
 
   const emptyLineWarningRef = useRef<HTMLHeadingElement | null>(null);
   const negabaritWarningRef = useRef<HTMLHeadingElement | null>(null);
+
+  const handleNumberSubmit = () => {
+    if (socket) {
+      socket.send(
+        JSON.stringify(JSON.stringify({ type: "negabarit_size_change", value: sizeValue }))
+      );
+    }
+  };
 
   useEffect(() => {
     if (
@@ -27,6 +39,7 @@ export const Home: FC = () => {
       isChartsInited = true;
 
       const socket = new WebSocket("ws://localhost:80/ws");
+      setSocket(socket);
 
       const chart1 = new Chart(
         chart1Ref.current.getContext("2d") as ChartItem,
@@ -215,6 +228,21 @@ export const Home: FC = () => {
           <h3 className="warning negabarit-found" ref={negabaritWarningRef}>
             <WarningOutlined /> Найден негабаритный объект
           </h3>
+        </div>
+        <div>
+          <InputNumber
+            defaultValue={sizeValue}
+            min={1}
+            max={1000}
+            onChange={(value) => setSizeValue(value as number)}
+          />
+          <Button
+            style={{ marginLeft: 15 }}
+            type="primary"
+            onClick={handleNumberSubmit}
+          >
+            Отправить
+          </Button>
         </div>
       </div>
     </div>

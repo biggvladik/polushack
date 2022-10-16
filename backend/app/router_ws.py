@@ -249,11 +249,13 @@ async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
 
     try:
-        NEGABARIT = await websocket.receive_json()
-        parsed_NEGABARIT = json.loads(NEGABARIT)
-        NEGABARIT_IN_MM = parsed_NEGABARIT['value']
 
         while (cap.isOpened()):
+            NEGABARIT = await websocket.receive_json()
+            parsed_NEGABARIT = json.loads(NEGABARIT)
+            NEGABARIT_IN_MM = parsed_NEGABARIT['value']
+
+
             frame_beggining_time = time.time() * 1000
             # Capture frame-by-frame
             ret, frame = cap.read()
