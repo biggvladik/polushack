@@ -1,0 +1,1 @@
+python yolov5/train.py --img 640 --batch 32 --epochs 10 --data particles_full.yaml --weights yolov5s.pt --hyp yolov5/data/hyps/hyp.particle.yaml

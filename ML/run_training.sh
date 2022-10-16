@@ -1,0 +1,1 @@
+python yolov5/train.py --img 640 --batch 32 --epochs 10 --data particles.yaml --weights yolov5s.pt --cache --evolve 20
