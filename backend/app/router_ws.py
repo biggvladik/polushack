@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-
+import json
 import base64
 from numpy import ndarray
 from fastapi import  WebSocket, WebSocketDisconnect
@@ -245,12 +245,11 @@ async def get():
 
 @router_ws.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    count = 0
+    frame_counter = 0
     await manager.connect(websocket)
     try:
         while (cap.isOpened()):
             frame_beggining_time = time.time() * 1000
-            frame_counter = 0
             # Capture frame-by-frame
             ret, frame = cap.read()
 
@@ -267,8 +266,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 large_particle_percentage.append((sum(predicted_areas) * 0.75) / (GREEN_AREA_AREA * 0.85))
                 if negabarit_found:
                     negabarit_this_second = True
+                im = {'type':'image',
+                      'bytes':str(image_to_base64(ims[0])),
+                      'negabarit_found':negabarit_found,
+                      'empty_line':empty_line,
+                      }
+                await manager.broadcast(im)  # отправка байтов на фронт
 
-                await manager.broadcast(str(image_to_base64(ims[0])))  # отправка байтов на фронт
 
                 processing_time = time.time() * 1000 - frame_beggining_time
                 print(f"Processing took: {int(processing_time)} ms")
@@ -282,12 +286,24 @@ async def websocket_endpoint(websocket: WebSocket):
                 frame_counter += 1
                 # Если началась следующая секунда
                 # Пересчет ежесекундных метрик
+                print(frame_counter)
                 if frame_counter % FPS == 0:
+                    print('yes')
                     average_predicted_size = sum(particle_sizes_arr) / len(particle_sizes_arr)
                     average_large_particle_percentage = sum(large_particle_percentage) / len(large_particle_percentage)
                     max_predicted_size = max(particle_sizes_arr)
                     # Гистограмма
                     histogram = get_histogram(particle_sizes_arr)
+                    metrics = {'type':'metrics',
+                               'average_predicted_size':float(average_predicted_size),
+                               'max_predicted_size':float(max_predicted_size),
+                               'average_large_particle_percentage':float(average_large_particle_percentage),
+                               'histogram':json.dumps(histogram),
+                               }
+                    await manager.broadcast(metrics)  # отправка байтов на фронт
+
+                    # отправить все
+
 
                     # Обнуляем все
                     particle_sizes_arr = []
@@ -304,4 +320,3 @@ async def websocket_endpoint(websocket: WebSocket):
                 # negabarit_this_second булевый флаг, был ли негабарит в секунду
     except WebSocketDisconnect:
         manager.disconnect(websocket)
-        await manager.broadcast(f"Client # left the chat")

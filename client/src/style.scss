@@ -6,34 +6,57 @@
 
 .stream {
   width: 100%;
-  height: 27vw;
+  height: 40vw;
+  object-fit: contain;
 }
 
 .left-items {
-  width: calc(52vw - 20px);
+  width: calc(35vw - 20px);
 }
 
 .right-items {
-  width: 48vw;
+  width: 65vw;
 }
 
-.chart1 {
+.chart1,
+.chart2,
+.chart3,
+.chart4 {
   width: 100%;
   height: 500px;
   margin: 0 10px 10px 0;
 }
 
-.chartsContainer {
-  height: 33%;
+.warnings {
+  display: flex;
+  padding: 10px;
 }
 
-.chart2,
-.chart3 {
-  width: 50%;
-  height: 100%;
+.warning {
+  color: red;
+  margin-right: 15px;
+  opacity: 0;
+  display: none;
+
+  &--active {
+    opacity: 1;
+    display: block;
+  }
 }
 
-.chart4 {
-  height: 33%;
-  width: 100%;
-}
+// .chartsContainer {
+//   height: 33%;
+//   width: 100%;
+//   df
+// }
+
+// .chart2,
+// .chart3 {
+//   width: 50%;
+//   height: 100%;
+// }
+
+// .chart4 {
+//   height: 33%;
+//   width: 100%;
+// }
