@@ -250,6 +250,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
     try:
 
+
         while (cap.isOpened()):
             NEGABARIT = await websocket.receive_json()
             parsed_NEGABARIT = json.loads(NEGABARIT)
