@@ -19,11 +19,11 @@ from PIL import Image
 from pathlib import Path
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
-model = torch.hub.load('ultralytics/yolov5', 'custom', path='video/yolov5s10epochstrainonly.pt',
+model = torch.hub.load('ultralytics/yolov5', 'custom', path='app/video/yolov5s10epochstrainonly.pt',
                        force_reload=True, device=device)
 # model.conf = 0.5
 # model.iou = 0.95
-cap = cv2.VideoCapture("video/kamni_edut.mp4")
+cap = cv2.VideoCapture("app/video/kamni_edut.mp4")
 
 FPS = 30
 TIME_PER_FRAME = 1000 / FPS  # In ms
@@ -247,7 +247,12 @@ async def get():
 async def websocket_endpoint(websocket: WebSocket):
     frame_counter = 0
     await manager.connect(websocket)
+
     try:
+        NEGABARIT = await websocket.receive_json()
+        parsed_NEGABARIT = json.loads(NEGABARIT)
+        NEGABARIT_IN_MM = parsed_NEGABARIT['value']
+
         while (cap.isOpened()):
             frame_beggining_time = time.time() * 1000
             # Capture frame-by-frame
