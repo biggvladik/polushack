@@ -192,53 +192,13 @@ def get_histogram(particle_sizes):
 
 router_ws = APIRouter()
 
-html = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Chat</title>
-    </head>
-    <body>
-        <h1>WebSocket Chat</h1>
-        <h2>Your ID: <span id="ws-id"></span></h2>
-        <form action="" onsubmit="sendMessage(event)">
-            <input type="text" id="messageText" autocomplete="off"/>
-            <button>Send</button>
-        </form>
-        <ul id='messages'>
-        </ul>
-        <script>
-            var client_id = Date.now()
-            document.querySelector("#ws-id").textContent = client_id;
-            var ws = new WebSocket(`ws://localhost:80/ws`);
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages')
-                var message = document.createElement('li')
-                var content = document.createTextNode(event.data)
-                message.appendChild(content)
-                messages.appendChild(message)
-            };
-            function sendMessage(event) {
-                var input = document.getElementById("messageText")
-                ws.send(input.value)
-                input.value = ''
-                event.preventDefault()
-            }
-        </script>
-    </body>
-</html>
-"""
+
 
 
 
 
 
 manager = ConnectionManager()
-
-
-@router_ws.get("/")
-async def get():
-    return HTMLResponse(html)
 
 
 
@@ -249,14 +209,12 @@ async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
 
     try:
+        NEGABARIT = await websocket.receive_json()
+        parsed_NEGABARIT = json.loads(NEGABARIT)
+        NEGABARIT_IN_MM = parsed_NEGABARIT['value']
 
 
         while (cap.isOpened()):
-            NEGABARIT = await websocket.receive_json()
-            parsed_NEGABARIT = json.loads(NEGABARIT)
-            NEGABARIT_IN_MM = parsed_NEGABARIT['value']
-
-
             frame_beggining_time = time.time() * 1000
             # Capture frame-by-frame
             ret, frame = cap.read()
@@ -266,7 +224,7 @@ async def websocket_endpoint(websocket: WebSocket):
             large_particle_percentage = []  # Процент площади крупных частиц каждую секунду
             negabarit_this_second = False  # Был ли в эту секунду негабарит
             if ret == True:
-                results = model(frame, size=1280)
+                results = model(frame, size=320)
                 results._run = _run_override.__get__(results, Detections)
                 ims, negabarit_found, empty_line, predicted_sizes, predicted_areas = results._run(labels=False,
                                                                                                   render=True)
